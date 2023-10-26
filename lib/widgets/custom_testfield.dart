@@ -31,8 +31,8 @@ class Customtextfield extends StatelessWidget {
         fillColor: Colors.transparent,
         errorText: error,
         icon: Container(
-          height: size.width * 0.5,
-          width: size.width * 0.5,
+          height: size.width * 0.15,
+          width: size.width * 0.15,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: Colors.grey.shade300,
@@ -40,7 +40,7 @@ class Customtextfield extends StatelessWidget {
           alignment: Alignment.center,
           child: Icon(
             Icons.lock,
-            size: size.height * 0.026,
+            size: size.height * 0.02,
             color: Colors.black87,
           ),
         ),

@@ -21,14 +21,14 @@ class PassCardProfile extends StatelessWidget {
     final size = MediaQuery.of(context).size;
 
     return Container(
-      width: size.width * .35,
-      height: size.height * .5,
+      width: size.width * 0.9,
+      height: size.height * 0.8,
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.all(Radius.circular(12)),
       ),
       child: Padding(
-        padding: EdgeInsets.all( size.width * 0.01),
+        padding: EdgeInsets.all( size.width * 0.04),
         child: Column(
           children: [
             const Text(

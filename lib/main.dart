@@ -1,5 +1,12 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:formz/formz.dart';
 import 'package:test_to_nnt/change_pass_card.dart';
+import 'package:test_to_nnt/utils/confirm_password.dart';
+import 'package:test_to_nnt/utils/current_password.dart';
+import 'package:test_to_nnt/utils/new_password.dart';
+import 'package:test_to_nnt/widgets/custom_testfield.dart';
 import 'package:test_to_nnt/widgets/global_button.dart';
 
 void main() {
@@ -26,6 +33,62 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  
+    ConfirmedPassword? confirmedPasswordGlobal = const ConfirmedPassword.pure();
+    CurrentPassword? currentPasswordGlobal = const CurrentPassword.pure();
+    NewPassword? newPasswordGlobal = const NewPassword.pure();
+  
+  void changeCurrentPassword(String currentPassword) {
+    final currentPasswordFormResult = CurrentPassword.dirty(currentPassword);
+    setState(() {
+      currentPasswordGlobal = currentPasswordFormResult;
+    });
+  }
+
+  void changeNewPassword(String newPassword) {
+    final newPasswordForm = NewPassword.dirty(
+      newPassword,
+    );
+
+    final confirmPass = ConfirmedPassword.dirty(
+      original: newPasswordGlobal!,
+      value: confirmedPasswordGlobal!.value,
+    );
+
+    setState(() {
+      newPasswordGlobal = newPasswordForm;
+      confirmedPasswordGlobal = confirmPass;
+    });
+  }
+
+  void changeConfirmPassword(String confirmPassword) {
+    final confirmPasswordForm = ConfirmedPassword.dirty(
+      original: newPasswordGlobal!,
+      value: confirmPassword,
+    );
+    setState(() {
+      confirmedPasswordGlobal = confirmPasswordForm;
+    });
+  }
+
+  void changePasswordFunction(){
+    final status = validateForm();
+    if( status.isValid ){
+      log( 'Validaciones correctas ');
+    } else {
+      log( ' Error al comprobar los campos, valide su informacion ' );
+    }
+  }
+
+  FormzStatus  validateForm() {
+    return Formz.validate([
+      confirmedPasswordGlobal!,
+      currentPasswordGlobal!,
+      newPasswordGlobal!
+    ]);
+  }
+
+
   @override
   Widget build(BuildContext context) {
 
@@ -34,14 +97,21 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('LOGIN'),
+        centerTitle: true,
+        backgroundColor: Colors.black,
+        elevation: 2,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(13)),
+        ),
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        child: SizedBox(
-          height: size.height,
-          width: size.width,
+        child: Container(
+          color: Colors.black12,
+          height: size.height * 1,
+          width: size.width * 1,
           child: Padding(
-            padding: EdgeInsets.all( size.height * .05 ),
+            padding: EdgeInsets.all( size.height * .03 ),
             child: Column(
               children: [
                 PassCardProfile(
@@ -53,11 +123,7 @@ class _LoginPageState extends State<LoginPage> {
                         currentFocus.unfocus();
                       }
 
-                      // TODO(RODRIGO): Validar este metodo
-                      // await _changeCubit.changePasswordFunction(
-                      //   isRequired: widget.changePassRequired!,
-                      //   l10n: l10n,
-                      // );
+                      changePasswordFunction();
                     },
                     textColor: Colors.white,
                     decoration: BoxDecoration(
@@ -66,33 +132,32 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   confirmPassword: Customtextfield(
-                    labelText: l10n.confirmPassProfile,
-                    error: state.confirmedPassword!.invalid
-                        ? l10n.confirmMessageError
+                    labelText: 'Confirmar contraseña',
+                    error: confirmedPasswordGlobal!.invalid
+                        ? 'Ambas contraseñas deben ser iguales'
                         : null,
                     onChanged: (string) {
-                      _changeCubit.changeConfirmPassword(string);
+                      changeConfirmPassword(string);
                     },
                   ),
                   currentTextfield: Customtextfield(
-                    labelText: (widget.changePassRequired ==
-                            RequiredChangePass.nonRequired)
-                        ? l10n.currentPassProfile
-                        : l10n.temporaryPassHint,
-                    error: state.currentPassword!.invalid
-                        ? l10n.requiredMessageError
+                    labelText: 'Contraseña anterior',
+                    // error: true
+                    error: currentPasswordGlobal!.invalid
+                        ? 'Este campo es requerido'
                         : null,
                     onChanged: (string) {
-                      _changeCubit.changeCurrentPassword(string);
+                      changeCurrentPassword(string);
                     },
                   ),
                   newPassword: Customtextfield(
-                    labelText: l10n.newPassProfile,
-                    error: state.newPassword!.invalid
-                        ? l10n.passwordInvalid
+                    labelText: 'Contraseña nueva',
+                    // error: true
+                    error: newPasswordGlobal!.invalid
+                        ? 'Contraseña invalidó'
                         : null,
                     onChanged: (string) {
-                      _changeCubit.changeNewPassword(string);
+                      changeNewPassword(string);
                     },
                   ),
                 ),
